@@ -44,13 +44,23 @@ export class StoryWrightProcessor {
           }
         });
 
-        var getStoriesScript = readFileSync(
-          __dirname + "/GetStories.js",
-          "utf8"
-        );
         await page.goto(join(STORY_URL, "iframe.html"));
         let stories: object[];
         try {
+
+          const storybookFeatures: {
+              argTypeTargetsV7:boolean;
+              buildStoriesJson:boolean;
+              disallowImplicitActionsInRenderV8: boolean;
+              legacyDecoratorFileOrder: boolean;
+              storyStoreV7: boolean;
+              warnOnLegacyHierarchySeparator: boolean
+          } = await page.evaluate(()=>{ return window['FEATURES'] });
+
+          const getStoriesScript = readFileSync(
+            __dirname + storybookFeatures.storyStoreV7 ? "/GetStoriesV2.js" : "/GetStories.js",
+            "utf8"
+          );
           stories = await page.evaluate(getStoriesScript);
         } catch (err) {
           // If getting stories from ifram.html is not sucessfull for storybook 7, try to get stories from stories.json
