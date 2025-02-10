@@ -44,16 +44,17 @@ export class StoryWrightProcessor {
           }
         });
 
-        var getStoriesScript = readFileSync(
-          __dirname + "/GetStories.js",
-          "utf8"
-        );
         await page.goto(join(STORY_URL, "iframe.html"));
         let stories: object[];
         try {
+          const getStoriesScript = readFileSync(
+            join(__dirname,"GetStories.js"),
+            "utf8"
+          );
           stories = await page.evaluate(getStoriesScript);
         } catch (err) {
           // If getting stories from ifram.html is not sucessfull for storybook 7, try to get stories from stories.json
+          // NOTE: this wont process Steps !
           const storiesJsonPath = resolve(options.url, "stories.json");
           if (!existsSync(storiesJsonPath)) {
             console.log("stories.json not found at ", storiesJsonPath);
@@ -64,6 +65,7 @@ export class StoryWrightProcessor {
           } = require(storiesJsonPath);
           stories = Object.values(rawStoriesObject.stories ?? {});
           console.log(`${stories.length} stories found`);
+          console.warn('NOTE: stories Steps will not be processed')
         }
         if (options.totalPartitions > 1) {
           console.log(
