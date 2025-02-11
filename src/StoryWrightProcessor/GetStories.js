@@ -6,7 +6,7 @@
                 buildStoriesJson:boolean;
                 disallowImplicitActionsInRenderV8: boolean;
                 legacyDecoratorFileOrder: boolean;
-                storyStoreV7: boolean;
+                storyStoreV7?: boolean;
                 warnOnLegacyHierarchySeparator: boolean
             }} SbFeatures
 */
@@ -74,8 +74,18 @@ function findSteps(res) {
  * @returns {Promise<Array<Record<string,unknown>>>}
  */
 function getPageStories(features) {
-  // NOTE: if storyStoreV7 is enabled ( default SB v7 ) api to get page stories is different and needs to be executed in 2 steps
-  if (features.storyStoreV7) {
+  /**
+   * only SB v7 supports this configuration
+   */
+  const supportsStoryStoreV7config = typeof features.storyStoreV7 === "boolean";
+  // NOTE:
+  // storyStoreV7:
+  //  - is configurable only in SB v7
+  //  - is `true` by default SB v7
+  //  - doesn't exist in SB v7 (enabled by default)
+
+  // get page stories async obtained from multiple build chunks
+  if (!supportsStoryStoreV7config || features.storyStoreV7) {
     return window["__STORYBOOK_CLIENT_API__"].storyStore
       .cacheAllCSFFiles()
       .then(() => {
