@@ -111,7 +111,7 @@ export class PlayWrightExecutor {
       // Check if the network or CPU are idle
       await this.page.waitForLoadState("load");
       await this.page.waitForLoadState("networkidle");
-      
+
       // Busy pending timeout is not expected so log it.
       if (busy.pendingTimeouts < 0) {
         console.log(`ERRR : Pending timeouts less than 0 ${busy.pendingTimeouts}`);
@@ -129,7 +129,7 @@ export class PlayWrightExecutor {
     let isBusy: boolean;
     let busy: Busy;
     do {
-      // Add a default wait for 1sec for css rendring, click or hover activities. 
+      // Add a default wait for 1sec for css rendring, click or hover activities.
       // Ideally the test should be authored in such a way that it should wait for element to be visible and then take screenshot but that gets missed out in most test cases.
       // Also on hover activities where just some background changes its difficult for test author to write such waiting mechanism hence adding default 1 second wait.
       await this.delay(this.options.waitTimeScreenshot);
@@ -278,7 +278,11 @@ export class PlayWrightExecutor {
   public elementScreenshot = async (selector: string, testName: string) => {
     try {
       selector = this.curateSelector(selector);
-      let element = await this.page.$(selector);
+      /**
+       * Stories are loaded via native ESM (async), we need to wait for the JS to be loaded and applied on DOM
+       */
+      const element = await this.page.waitForSelector(selector);
+
       if (await element.isVisible()) {
         let screenshotPath = this.getScreenshotPath(testName);
 
@@ -378,7 +382,7 @@ export class PlayWrightExecutor {
 
 
   /*  This will insert double quotes around selector string, if missing.
-      Eg: buttonbutton[data-id=ex123][attr=ex432] will be changed to button[data-id="ex123"][attr="ex432"] 
+      Eg: buttonbutton[data-id=ex123][attr=ex432] will be changed to button[data-id="ex123"][attr="ex432"]
   */
   private curateSelector(selector: string) {
     //No need to check if selector doesn't contain equals to (=)
@@ -389,7 +393,7 @@ export class PlayWrightExecutor {
     let newSelector = "";
     newSelector = selector.substring(0, selector.indexOf("=") + 1);
 
-    //Loop through all attributes 
+    //Loop through all attributes
     while (selector.indexOf("[") > -1 && selector.indexOf("=") > -1) {
       /*  Pulls out chars b/w equals to (=) and closing square bracket (])
           Eg: button[data-id=ex123] will give "ex123" to temp
@@ -403,7 +407,7 @@ export class PlayWrightExecutor {
 
       newSelector += temp + "]";
 
-      // Move to the next chunk to curate 
+      // Move to the next chunk to curate
       // Eg: If buttonbutton[data-id=ex123][attr=ex432] then move selector to [attr=432]
       selector = selector.substring(selector.indexOf("]") + 1, selector.length);
     }
