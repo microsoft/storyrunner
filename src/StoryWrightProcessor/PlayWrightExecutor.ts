@@ -3,6 +3,7 @@ import { Page } from "playwright";
 import { sep } from "path";
 import { StoryWrightOptions } from "./StoryWrightOptions";
 import { StepsExecutor } from "./StepsExecutor";
+import type { Step } from "../StoryWright/Steps";
 /**
  * Class containing playwright exposed functions.
  */
@@ -18,15 +19,14 @@ class Busy {
 export class PlayWrightExecutor {
   private fileSuffix: number = 0;
 
-  //Marking in public temporarily just to avoid tsc compilation error
-  public isPageBusy;
+  private isPageBusy: () => Promise<Busy>;
 
   constructor(
     private page: Page,
     private ssNamePrefix: string,
     private browserName: string,
     private options: StoryWrightOptions,
-    private story: object
+    private story: {steps?: Step[]}
   ) {
   }
 
@@ -154,7 +154,7 @@ export class PlayWrightExecutor {
   }
 
   public async processStory() {
-    const steps = this.story["steps"];
+    const steps = this.story.steps;
     try {
       await StepsExecutor.executesteps(steps, this);
     } catch (err) {

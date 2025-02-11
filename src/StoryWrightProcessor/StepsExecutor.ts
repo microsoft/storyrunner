@@ -1,12 +1,13 @@
 import { Keys } from "./Keys";
 import { StepType } from "./StepTypes";
 import { PlayWrightExecutor } from "./PlayWrightExecutor";
+import type { Step } from "../StoryWright/Steps";
 
 /**
  * Functions exposed in browser context called from React component.
  */
 export class StepsExecutor {
-  public static async executesteps(steps: any[], executor: PlayWrightExecutor) {
+  public static async executesteps(steps: Step[], executor: PlayWrightExecutor) {
 
     if (steps === null || steps === undefined || steps.length == 0) {
       console.log(`Steps object is ${steps}`);
