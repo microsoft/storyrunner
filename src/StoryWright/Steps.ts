@@ -1,16 +1,20 @@
 type optionsObj = {
-  [key: string]: any;
+  cropTo?: string;
+  maxTime?: string;
+  isPassword?: boolean;
+  [key: string]: unknown;
 };
 
+
 export class Steps {
-  steps = [];
+  steps: Step[] = [];
 
   public snapshot(name: string, opts?: optionsObj) {
-    var step = {
+    const step = {
       type: "saveScreenshot",
       name: name,
       locator: {},
-    };
+    } as Step;
     if (opts && typeof opts.cropTo === "string") {
       step.type = "cropScreenshot";
       step.locator = {
@@ -22,10 +26,10 @@ export class Steps {
   }
 
   public url(url: string) {
-    var step = {
+    const step = {
       type: "url",
       url: url,
-    };
+    } as Step;
     this.steps.push(step);
     return this;
   }
@@ -35,13 +39,13 @@ export class Steps {
   }
 
   public click(selector: string, options?: optionsObj) {
-    var step = {
+    const step = {
       type: "clickElement",
       locator: {
         value: selector,
       },
       maxTime: "",
-    };
+    } as Step;
     if (options && options.maxTime) {
       step.maxTime = options.maxTime;
     }
@@ -50,21 +54,21 @@ export class Steps {
   }
 
   public hover(selector: string) {
-    var step = {
+    const step = {
       type: "moveTo",
       locator: {
         value: selector,
       },
-    };
+    } as Step;
     this.steps.push(step);
     return this;
   }
 
   public mouseDown(selector: string) {
-    var step = {
+    const step = {
       type: "clickAndHoldElement",
       locator: {},
-    };
+    } as Step;
     if (selector) {
       step.locator = {
         value: selector,
@@ -75,10 +79,10 @@ export class Steps {
   }
 
   public mouseUp(selector: string) {
-    var step = {
+    const step = {
       type: "releaseElement",
       locator: {},
-    };
+    } as Step;
     if (selector) {
       step.locator = {
         value: selector,
@@ -89,14 +93,14 @@ export class Steps {
   }
 
   public setValue(selector: string, text: string, options?: optionsObj) {
-    var step = {
+    const step = {
       type: "setElementText",
       locator: {
         value: selector,
       },
       text: text,
       isPassword: false,
-    };
+    } as Step;
     if (options && options.isPassword) {
       step.isPassword = true;
     }
@@ -105,24 +109,24 @@ export class Steps {
   }
 
   public clearValue(selector: string) {
-    var step = {
+    const step = {
       type: "clearElementText",
       locator: {
         value: selector,
       },
-    };
+    } as Step;
     this.steps.push(step);
     return this;
   }
 
   public keys(selector: string, keys: string) {
-    var step = {
+    const step = {
       type: "sendKeys",
       locator: {
         value: selector,
       },
       keys: keys,
-    };
+    } as Step;
     this.steps.push(step);
     return this;
   }
@@ -132,16 +136,16 @@ export class Steps {
   }
 
   public executeScript(code: string) {
-    var step = {
+    const step = {
       type: "executeScript",
       code: code,
-    };
+    } as Step;
     this.steps.push(step);
     return this;
   }
 
   public wait(msOrSelector, options?: optionsObj) {
-    var step;
+    let step: Step;
     if (typeof msOrSelector === "number") {
       step = {
         type: "pause",
@@ -163,13 +167,13 @@ export class Steps {
   }
 
   public waitForNotFound(selector: string, options?: optionsObj) {
-    var step = {
+    const step = {
       type: "waitForElementNotPresent",
       locator: {
         value: selector,
       },
       maxTime: "",
-    };
+    } as Step;
     if (options && options.maxTime) {
       step.maxTime = options.maxTime;
     }
@@ -178,17 +182,18 @@ export class Steps {
   }
 
   public cssAnimations(isEnabled: boolean) {
-    var step = {
+    const step = {
       type: "cssAnimations",
       isEnabled: isEnabled,
-    };
+    } as Step;
     this.steps.push(step);
     return this;
   }
 }
 
 export interface Locator {
-  type: "css selector";
+  // FIXME: this is never set - remove ?
+  type?: "css selector";
   value: string;
 }
 
@@ -207,7 +212,8 @@ export type StepType =
   | "pause"
   | "waitForElementPresent"
   | "waitForElementNotPresent"
-  | "cssAnimations";
+  | "cssAnimations"
+  | "clearElementText";
 
 export interface Step {
   type: StepType;
@@ -216,6 +222,7 @@ export interface Step {
   name?: string;
   text?: string;
   isPassword?: boolean;
+  maxTime?: string;
   keys?: string;
   code?: string;
   isAsync?: boolean;
