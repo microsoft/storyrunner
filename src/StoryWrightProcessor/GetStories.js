@@ -20,7 +20,14 @@ function getStoriesWithSteps() {
   const storybookFeatures = window["FEATURES"];
 
   return getPageStories(storybookFeatures).then((stories) => {
-    let ret = [];
+    /**
+     * @type {typeof stories}
+     */
+    const storiesWithSteps = [];
+    /**
+     * @type {string[]} story ids that failed while processing storyFn
+     */
+    const errors = [];
     for (let story of stories) {
       try {
         if (typeof story.storyFn === "function") {
@@ -31,13 +38,15 @@ function getStoriesWithSteps() {
           }
         }
       } catch (ex) {
-        console.error("Error processing render() method of:", story["id"]);
+        errors.push(story["id"]);
+        console.error("Error processing render() method of: " + story["id"]);
         console.error(ex);
       }
-      ret.push(story);
+
+      storiesWithSteps.push(story);
     }
 
-    return ret;
+    return { storiesWithSteps, errors };
   });
 }
 
@@ -71,7 +80,7 @@ function findSteps(res) {
 /**
  *
  * @param {SbFeatures} features
- * @returns {Promise<Array<Record<string,unknown>>>}
+ * @returns {Promise<Array<{id:string;[key:string]:unknown}>>}
  */
 function getPageStories(features) {
   /**
