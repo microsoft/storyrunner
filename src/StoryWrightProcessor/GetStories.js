@@ -11,6 +11,15 @@
             }} SbFeatures
 */
 
+/**
+ * @typedef {{
+   id:string;
+   parameters?: {[name: string]: any} & Partial<import('../StoryWright/Steps').StoryParameter>;
+   storyFn?: ()=>unknown;
+   [key:string]:unknown;
+  }} Story
+ */
+
 getStoriesWithSteps();
 
 function getStoriesWithSteps() {
@@ -30,7 +39,12 @@ function getStoriesWithSteps() {
     const errors = [];
     for (let story of stories) {
       try {
-        if (typeof story.storyFn === "function") {
+        if (usesNewParametersApi(story)) {
+          const steps = story.parameters.storyWright.steps;
+          if (Array.isArray(steps)) {
+            story.steps = steps;
+          }
+        } else if (usesOldStoryFnCall(story)) {
           let res = story.storyFn();
           let steps = findSteps(res);
           if (steps !== "undefined" && steps !== null) {
@@ -48,6 +62,23 @@ function getStoriesWithSteps() {
 
     return { storiesWithSteps, errors };
   });
+}
+
+/**
+ *
+ * @param {Story} story
+ * @returns
+ */
+function usesNewParametersApi(story) {
+  return story.parameters && story.parameters.storyWright;
+}
+/**
+ *
+ * @param {Story} story
+ * @returns
+ */
+function usesOldStoryFnCall(story) {
+  return typeof story.storyFn === "function";
 }
 
 /**
@@ -80,7 +111,7 @@ function findSteps(res) {
 /**
  *
  * @param {SbFeatures} features
- * @returns {Promise<Array<{id:string;[key:string]:unknown}>>}
+ * @returns {Promise<Array<Story>>}
  */
 function getPageStories(features) {
   /**

@@ -5,7 +5,6 @@ type optionsObj = {
   [key: string]: unknown;
 };
 
-
 export class Steps {
   steps: Step[] = [];
 
@@ -228,4 +227,8 @@ export interface Step {
   isAsync?: boolean;
   waitTime?: number;
   isEnabled?: boolean;
+}
+
+export interface StoryParameter {
+  storyWright: { steps: Step[] };
 }
