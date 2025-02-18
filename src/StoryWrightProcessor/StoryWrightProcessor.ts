@@ -64,6 +64,10 @@ export class StoryWrightProcessor {
             );
             console.warn(errors.join('\n'));
             console.warn('-'.repeat(60),'\n');
+
+            if(options.bailOnStoriesError){
+              process.exit(1)
+            }
           }
 
         } catch (err) {

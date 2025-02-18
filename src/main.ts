@@ -94,6 +94,12 @@ const args = argv
     nargs: 1,
     type: "number",
   })
+  .option("bailOnStoriesError", {
+    default: false,
+    describe:
+      "Fail process without taking any screenshot if any errors occurred while processing Stories.",
+    type: "boolean",
+  })
   .strict(true)
   .argv;
 
@@ -128,7 +134,8 @@ const storyWrightOptions: StoryWrightOptions = {
   partitionIndex: args.partitionIndex,
   totalPartitions: args.totalPartitions,
   waitTimeScreenshot: args.waitTimeScreenshot,
-  excludePatterns: args.excludePatterns
+  excludePatterns: args.excludePatterns,
+  bailOnStoriesError: args.bailOnStoriesError
 };
 
 StoryWrightProcessor.process(storyWrightOptions);
