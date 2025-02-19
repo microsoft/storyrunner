@@ -156,8 +156,7 @@ export class PlayWrightExecutor {
   public async processStory() {
     const steps = this.story.steps;
     try {
-      console.info(`Execute steps for story-id:${this.story.id}`)
-      await StepsExecutor.executesteps(steps, this);
+      await StepsExecutor.executesteps(steps, this, this.story.id);
     } catch (err) {
       console.error("ERROR: completed steps: ", err.message);
       throw err;

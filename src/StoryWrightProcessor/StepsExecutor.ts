@@ -7,10 +7,12 @@ import type { Step } from "../StoryWright/Steps";
  * Functions exposed in browser context called from React component.
  */
 export class StepsExecutor {
-  public static async executesteps(steps: Step[], executor: PlayWrightExecutor) {
+  public static async executesteps(steps: Step[], executor: PlayWrightExecutor, _storyId:string) {
+
+    console.info(`steps: ${_storyId} - initiate execution`);
 
     if (steps === null || steps === undefined || steps.length == 0) {
-      console.log(`Steps object is ${steps}`);
+      console.info(`steps: ${_storyId} - no Steps defined - creating default story screenshot`);
       await executor.makeScreenshot();
       await executor.done();
       return;
