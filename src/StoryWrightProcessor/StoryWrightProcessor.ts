@@ -203,6 +203,10 @@ export class StoryWrightProcessor {
                 console.log(
                   `**ERROR** for story ${ssNamePrefix} ${story["id"]} ${storyIndex}/${stories.length} ${err}`
                 );
+
+                if(options.bailOnStoriesError){
+                  process.exit(1);
+                }
               } finally {
                 if (context != null) {
                   await context.close();

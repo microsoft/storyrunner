@@ -97,7 +97,7 @@ const args = argv
   .option("bailOnStoriesError", {
     default: false,
     describe:
-      "Fail process without taking any screenshot if any errors occurred while processing Stories.",
+      "Fail process if errors occurred while processing Stories or during making screenshots. Useful to make sure that your VR Test are valid and in CI scenarios.",
     type: "boolean",
   })
   .strict(true)
