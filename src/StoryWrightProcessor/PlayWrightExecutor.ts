@@ -3,7 +3,7 @@ import { Page } from "playwright";
 import { sep } from "path";
 import { StoryWrightOptions } from "./StoryWrightOptions";
 import { StepsExecutor } from "./StepsExecutor";
-import type { Step } from "../StoryWright/Steps";
+import type { Story } from "../utils";
 /**
  * Class containing playwright exposed functions.
  */
@@ -26,7 +26,7 @@ export class PlayWrightExecutor {
     private ssNamePrefix: string,
     private browserName: string,
     private options: StoryWrightOptions,
-    private story: {steps?: Step[]}
+    private story: Story
   ) {
   }
 
@@ -156,6 +156,7 @@ export class PlayWrightExecutor {
   public async processStory() {
     const steps = this.story.steps;
     try {
+      console.info(`Execute steps for story-id:${this.story.id}`)
       await StepsExecutor.executesteps(steps, this);
     } catch (err) {
       console.error("ERROR: completed steps: ", err.message);

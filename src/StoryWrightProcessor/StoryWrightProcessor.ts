@@ -3,7 +3,7 @@ import { Browser, BrowserContext, Page } from "playwright";
 import { BrowserUtils } from "./BrowserUtils";
 import { PlayWrightExecutor } from "./PlayWrightExecutor";
 import { StoryWrightOptions } from "./StoryWrightOptions";
-import { partitionArray } from "../utils";
+import { partitionArray, Story } from "../utils";
 import { readFileSync, existsSync } from "fs";
 
 /**
@@ -45,14 +45,15 @@ export class StoryWrightProcessor {
         });
 
         await page.goto(join(STORY_URL, "iframe.html"));
-        let stories: object[];
+
+        let stories: Story[];
         try {
           const getStoriesScript = readFileSync(
             join(__dirname, "GetStories.js"),
             "utf8"
           );
           const { storiesWithSteps, errors } = await page.evaluate<{
-            storiesWithSteps: { [key: string]: unknown; id: string }[];
+            storiesWithSteps: Story[];
             errors: string[];
           }>(getStoriesScript);
           stories = storiesWithSteps;
@@ -115,9 +116,9 @@ export class StoryWrightProcessor {
             position + options.concurrency
           );
           await Promise.all(
-            itemsForBatch.map(async (story: object) => {
-              const id: string = story["id"];
-              const tags: string = story["tags"];
+            itemsForBatch.map(async (story: Story) => {
+              const id = story["id"];
+              const tags = story["tags"];
               if (tags && tags.includes("no-screenshot")) {
                 console.log(
                   `StoryId: ${id} has tag no-screenshot hence skipping.`

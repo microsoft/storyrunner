@@ -11,14 +11,7 @@
             }} SbFeatures
 */
 
-/**
- * @typedef {{
-   id:string;
-   parameters?: {[name: string]: any} & Partial<import('../StoryWright/Steps').StoryParameter>;
-   storyFn?: ()=>unknown;
-   [key:string]:unknown;
-  }} Story
- */
+
 
 getStoriesWithSteps();
 
@@ -46,8 +39,8 @@ function getStoriesWithSteps() {
           }
         } else if (usesOldStoryFnCall(story)) {
           let res = story.storyFn();
-          let steps = findSteps(res);
-          if (steps !== "undefined" && steps !== null) {
+          const steps = findSteps(res);
+          if (steps !== undefined && steps !== null) {
             story.steps = steps;
           }
         }
@@ -66,7 +59,7 @@ function getStoriesWithSteps() {
 
 /**
  *
- * @param {Story} story
+ * @param {import('../utils').Story} story
  * @returns
  */
 function usesNewParametersApi(story) {
@@ -74,7 +67,7 @@ function usesNewParametersApi(story) {
 }
 /**
  *
- * @param {Story} story
+ * @param {import('../utils').Story} story
  * @returns
  */
 function usesOldStoryFnCall(story) {
@@ -84,7 +77,7 @@ function usesOldStoryFnCall(story) {
 /**
  *
  * @param {Record<string,any>} res
- * @returns
+ * @returns {import('../utils').Story['steps'] | undefined}
  */
 function findSteps(res) {
   if (res.props && res.props.isStowrWrightComponent === true) {
@@ -111,7 +104,7 @@ function findSteps(res) {
 /**
  *
  * @param {SbFeatures} features
- * @returns {Promise<Array<Story>>}
+ * @returns {Promise<Array<import('../utils').Story>>}
  */
 function getPageStories(features) {
   /**

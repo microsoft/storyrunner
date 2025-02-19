@@ -8,3 +8,16 @@ export const partitionArray = <T>(
   const startingIndex = (partitionIndex - 1) * elementsInEachPartition;
   return array.slice(startingIndex, startingIndex + elementsInEachPartition);
 };
+
+export interface Story {
+  id: string;
+  tags: string[];
+  name: string;
+  kind: string;
+  parameters?: { [name: string]: any } & Partial<
+    import("./StoryWright/Steps").StoryParameter
+  >;
+  steps?: import('./StoryWright/Steps').Step[];
+  storyFn?: () => unknown;
+  [key: string]: unknown;
+}
