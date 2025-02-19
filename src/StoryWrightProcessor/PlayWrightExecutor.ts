@@ -155,8 +155,17 @@ export class PlayWrightExecutor {
 
   public async processStory() {
     const steps = this.story.steps;
+
     try {
-      await StepsExecutor.executesteps(steps, this, this.story.id);
+      if (steps === null || steps === undefined || steps.length == 0) {
+        await this.makeScreenshot();
+        await this.done();
+        return;
+      }
+
+      console.info(`steps: ${this.story.id} - start`);
+      await StepsExecutor.executesteps(steps, this);
+      console.info(`steps: ${this.story.id} - end`);
     } catch (err) {
       console.error("ERROR: completed steps: ", err.message);
       throw err;
