@@ -313,7 +313,7 @@ export class PlayWrightExecutor {
   public hover = async (selector: string) => {
     try {
       selector = this.curateSelector(selector);
-      const element = await this.page.$(selector);
+      const element = await this.page.waitForSelector(selector);
       await element.hover({
         force: true,
       });
