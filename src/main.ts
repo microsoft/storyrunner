@@ -4,12 +4,22 @@ import { BrowserName } from "./StoryWrightProcessor/Constants";
 import { StoryWrightOptions } from "./StoryWrightProcessor/StoryWrightOptions";
 import { StoryWrightProcessor } from "./StoryWrightProcessor/StoryWrightProcessor";
 //import { resolve } from "path";
-import {cpus} from "os";
+import { cpus } from "os";
 
 const args = argv
+  .help()
+  .alias("help", "h")
   .usage("Usage: $0 [options]")
-  .help("h")
-  .alias("h", "help")
+  .example([
+    [
+      "$0",
+      "Captures screenshot for all stories using default static storybook path dist/iframe.html",
+    ],
+    [
+      "$0 -url https://localhost:5555 --browsers chromium",
+      "Captures screenshot for all stories from given storybook url for chromium browser",
+    ],
+  ])
   .option("url", {
     alias: "storybookurl",
     default: "dist",
@@ -26,7 +36,6 @@ const args = argv
     type: "string",
   })
   .option("browsers", {
-    alias: "browsers",
     default: [BrowserName.Chromium, BrowserName.Firefox],
     describe: "Comma seperated list of browsers to support",
     nargs: 1,
@@ -37,17 +46,15 @@ const args = argv
     choices: [BrowserName.Chromium, BrowserName.Firefox, BrowserName.Webkit],
   })
   .option("excludePatterns", {
-    alias: "excludePatterns",
     default: [BrowserName.Chromium, BrowserName.Firefox],
     describe: "Comma seperated list of StoryName regex pattern to be excluded",
     nargs: 1,
     type: "array",
     coerce: (array) => {
       return array.flatMap((v) => v.split(","));
-    }
+    },
   })
   .option("headless", {
-    alias: "headless",
     default: false,
     describe:
       "True if browser needs to be launched in headless mode else false",
@@ -67,14 +74,12 @@ const args = argv
     type: "number",
   })
   .option("concurrency", {
-    alias: "concurrency",
     default: 8,
     describe: "Number of browser tabs to open in parallel",
     nargs: 1,
     type: "number",
   })
   .option("skipSteps", {
-    alias: "skipSteps",
     default: false,
     describe:
       "Take Screenshot of all Storybook stories with/without wrapped component",
@@ -84,25 +89,36 @@ const args = argv
   .option("waitTimeScreenshot", {
     alias: "waitTimeScreenshot",
     default: 1000,
-    describe:
-      "Time to wait before taking screenshot",
+    describe: "Time to wait before taking screenshot",
     nargs: 1,
     type: "number",
   })
-  .example(
-    "$0",
-    "Captures screenshot for all stories using default static storybook path dist/iframe.html"
-  )
-  .example(
-    "$0 -url https://localhost:5555 --browsers chromium",
-    "Captures screenshot for all stories from given storybook url for chromium browser"
-  ).argv;
+  .option("bailOnStoriesError", {
+    default: false,
+    describe:
+      "Fail process if errors occurred while processing Stories or during making screenshots. Useful to make sure that your VR Test are valid and in CI scenarios.",
+    type: "boolean",
+  })
+  .option("stepsApi", {
+    /**
+     * NOTE: next major will use `parameters` as default
+     */
+    default: "component" as StoryWrightOptions["stepsApi"],
+    describe: [
+      "Configure which API should be used to define Story Steps.",
+      "NOTE: 'component' will be removed in next major to support Storybook 9",
+      "NOTE: 'parameters' will work only with CSF3 format of your Stories. Decorators containing StoryWright component won't be processed",
+    ].join("\n"),
+    type: "string",
+    choices: ["component", "parameters"],
+  })
+  .strict(true).argv;
 
 // When http(s) storybook url is passed no modification required.
 // When file path is provided it needs to be converted to absolute path and file:/// needs to be added to support firefox browser.
 
 //const url: string =
-  //args.url.indexOf("http") > -1 ? args.url : "file:///" + resolve(args.url);
+//args.url.indexOf("http") > -1 ? args.url : "file:///" + resolve(args.url);
 
 console.log(`================ StoryWright params =================`);
 console.log(`Storybook url = ${args.url}`);
@@ -128,7 +144,9 @@ const storyWrightOptions: StoryWrightOptions = {
   partitionIndex: args.partitionIndex,
   totalPartitions: args.totalPartitions,
   waitTimeScreenshot: args.waitTimeScreenshot,
-  excludePatterns: args.excludePatterns
+  excludePatterns: args.excludePatterns,
+  bailOnStoriesError: args.bailOnStoriesError,
+  stepsApi: args.stepsApi,
 };
 
 StoryWrightProcessor.process(storyWrightOptions);
