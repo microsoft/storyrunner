@@ -14,9 +14,7 @@ export interface Story {
   tags: string[];
   name: string;
   kind: string;
-  parameters?: { [name: string]: any } & Partial<
-    import("./StoryWright/Steps").StoryParameter
-  >;
+  parameters?:  import("./StoryWright/Steps").StoryParameters;
   steps?: import('./StoryWright/Steps').Step[];
   storyFn?: () => unknown;
   [key: string]: unknown;

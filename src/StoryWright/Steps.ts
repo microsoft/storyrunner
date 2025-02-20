@@ -229,6 +229,10 @@ export interface Step {
   isEnabled?: boolean;
 }
 
-export interface StoryParameter {
-  storyWright: { steps: Step[] };
+interface Parameters {
+ [name: string]: any
+}
+
+export interface StoryParameters extends Parameters {
+  storyWright?: { steps: Step[] };
 }
